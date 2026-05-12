@@ -1,0 +1,14 @@
+{
+	"type" : "Standard",
+	"name" : "qSegmenter (Standard Plugin)",
+	"icon" : ":/CC/plugin/qSegmenter/images/leg.png",
+	"description": "still does nothing",
+	"authors" : [
+		{
+			"name" : "Ola Trooster",
+			"email" : "trooster.ola@gmail.com"
+		}
+	],
+	"maintainers" : [],
+	"references" : []
+}

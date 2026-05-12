@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/CC/plugin/qSegmenter" >
+    <file>images/leg.png</file>
+    <file>info.json</file>
+  </qresource>
+</RCC>

@@ -25,7 +25,7 @@ namespace Example
 	
 		// This is how you can output messages
 		// Display a standard message in the console
-		appInterface->dispToConsole( "[ExamplePlugin] Hello world!", ccMainAppInterface::STD_CONSOLE_MESSAGE );
+		appInterface->dispToConsole( "[ExamplePlugin] nahhhh for reallll!", ccMainAppInterface::STD_CONSOLE_MESSAGE );
 		
 		// Display a warning message in the console
 		appInterface->dispToConsole( "[ExamplePlugin] Warning: example plugin shouldn't be used as is", ccMainAppInterface::WRN_CONSOLE_MESSAGE );

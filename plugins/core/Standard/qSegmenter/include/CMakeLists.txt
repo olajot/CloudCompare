@@ -2,7 +2,7 @@
 target_sources( ${PROJECT_NAME}
 	PRIVATE
 		${CMAKE_CURRENT_LIST_DIR}/ActionA.h
-		${CMAKE_CURRENT_LIST_DIR}/ExamplePlugin.h
+		${CMAKE_CURRENT_LIST_DIR}/qSegmenter.h
 )
 
 target_include_directories( ${PROJECT_NAME}

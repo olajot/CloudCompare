@@ -1,13 +1,10 @@
 # CloudCompare example for standard plugins
 
-# REPLACE ALL 'ExamplePlugin' OCCURENCES BY YOUR PLUGIN NAME
-# AND ADAPT THE CODE BELOW TO YOUR OWN NEEDS!
-
 # Add an option to CMake to control whether we build this plugin or not
-option( PLUGIN_EXAMPLE_STANDARD "Install example plugin" OFF )
+option( PLUGIN_STANDARD_QSEGMENTER "Install qSegmenter plugin" OFF )
 
-if ( PLUGIN_EXAMPLE_STANDARD )
-	project( ExamplePlugin )
+if ( PLUGIN_STANDARD_QSEGMENTER )
+	project( qSegmenter )
 	 
 	AddPlugin( NAME ${PROJECT_NAME} )
 		
