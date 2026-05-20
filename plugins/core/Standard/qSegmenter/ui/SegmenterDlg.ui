@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SegmenterDialog</class>
+ <widget class="QDialog" name="SegmenterDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x> <y>0</y> <width>350</width> <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Tissue Segmenter</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="seedGroup">
+     <property name="title">
+      <string>Seed Placement</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QRadioButton" name="radioPositive">
+        <property name="text"><string>Positive (+)</string></property>
+        <property name="checked"><bool>true</bool></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioNegative">
+        <property name="text"><string>Negative (-)</string></property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="paramGroup">
+     <property name="title">
+      <string>Algorithm Parameters</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelWs"><property name="text"><string>Spatial Weight (ws):</string></property></widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="spinWs"><property name="maximum"><double>1.0</double></property><property name="singleStep"><double>0.1</double></property><property name="value"><double>0.5</double></property></widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelWc"><property name="text"><string>Chromatic Weight (wc):</string></property></widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="spinWc"><property name="maximum"><double>1.0</double></property><property name="singleStep"><double>0.1</double></property><property name="value"><double>0.5</double></property></widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="labelTau"><property name="text"><string>Threshold (tau):</string></property></widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="spinTau"><property name="maximum"><double>1000.0</double></property><property name="value"><double>10.0</double></property></widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="actionLayout">
+     <item><widget class="QPushButton" name="btnUndo"><property name="text"><string>Undo</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnRedo"><property name="text"><string>Redo</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnClear"><property name="text"><string>Clear All</string></property></widget></item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

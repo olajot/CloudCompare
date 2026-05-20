@@ -10,6 +10,7 @@ if ( PLUGIN_STANDARD_QSEGMENTER )
 		
 	add_subdirectory( include )
 	add_subdirectory( src )
+	add_subdirectory( ui )
 	
 	# set dependencies to necessary libraries
 	# target_link_libraries( ${PROJECT_NAME} LIB1 )

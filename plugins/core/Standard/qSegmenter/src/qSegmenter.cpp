@@ -13,16 +13,10 @@ qSegmenter::qSegmenter( QObject *parent )
 	, m_action( nullptr )
 {
 }
-
 // This method should enable or disable your plugin actions
 // depending on the currently selected entities ('selectedEntities').
-void qSegmenter::onNewSelection( const ccHObject::Container &selectedEntities )
+void qSegmenter::onNewSelection(const ccHObject::Container& selectedEntities)
 {
-	if ( m_action == nullptr )
-	{
-		return;
-	}
-	
 	// If you need to check for a specific type of object, you can use the methods
 	// in ccHObjectCaster.h or loop and check the objects' classIDs like this:
 	//
@@ -33,11 +27,26 @@ void qSegmenter::onNewSelection( const ccHObject::Container &selectedEntities )
 	//			// ... do something with the viewports
 	//		}
 	//	}
-	
-	// For example - only enable our action if something is selected.
-	// m_action->setEnabled( !selectedEntities.empty() ); // jasper: commented
-}
 
+	// For example - only enable our action if something is selected.
+	// m_action->setEnabled( !selectedEntities.empty() )
+
+	if (!m_action)
+		return;
+
+	bool hasCloud = false;
+
+	for (ccHObject* obj : selectedEntities)
+	{
+		if (obj->isA(CC_TYPES::POINT_CLOUD))
+		{
+			hasCloud = true;
+			break;
+		}
+	}
+
+	m_action->setEnabled(hasCloud);
+}
 // This method returns all the 'actions' your plugin can perform.
 // getActions() will be called only once, when plugin is loaded.
 QList<QAction *> qSegmenter::getActions()
