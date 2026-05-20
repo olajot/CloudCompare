@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug CloudCompare (qSegmenter)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-debug/qCC/CloudCompare.app/Contents/MacOS/CloudCompare",
+      "preLaunchTask": "Build qSegmenter (Debug)",
+      "cwd": "${workspaceFolder}/build-debug"
+    },
+    {
+      "name": "Release CloudCompare (qSegmenter)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-release/qCC/CloudCompare.app/Contents/MacOS/CloudCompare",
+      "preLaunchTask": "Build qSegmenter (Release)",
+      "cwd": "${workspaceFolder}/build-release"
+    }
+  ]
+}
