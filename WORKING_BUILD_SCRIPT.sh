@@ -24,6 +24,8 @@ fix_rpath() {
 build() {
   local build_type="$1"
   local build_dir="build-$(echo "$build_type" | tr '[:upper:]' '[:lower:]')"
+  local suffix=""
+  [[ "$build_type" == "Debug" ]] && suffix="d"
 
   echo "==> Configuring $build_type in $build_dir"
   mkdir -p "$build_dir"
@@ -36,7 +38,7 @@ build() {
   sudo cmake --install "$build_dir"
 
   echo "==> Fixing rpaths"
-  fix_rpath /usr/local/CloudCompare/CloudCompare.app/Contents/PlugIns/ccPlugins/libqSegmenter.dylib
+  fix_rpath /usr/local/CloudCompare/CloudCompare.app/Contents/PlugIns/ccPlugins/libqSegmenter${suffix}.dylib
 }
 
 case "${1:-both}" in
