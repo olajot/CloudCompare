@@ -23,6 +23,8 @@ SegmenterDlg::SegmenterDlg(QWidget* parent)
 	connect(ui->spinWs, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SegmenterDlg::stateChanged);
 	connect(ui->spinWc, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SegmenterDlg::stateChanged);
 	connect(ui->spinTau, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SegmenterDlg::stateChanged);
+	
+	this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
 }
 
 SegmenterDlg::~SegmenterDlg()

@@ -78,12 +78,23 @@ namespace Example
 		// Ensure picker starts with the correct mode based on the UI's default
 		g_seedPicker->setPositiveMode(g_dialog->isAddingPositiveSeeds());
 
-		// Tell the picker to update whenever the UI state changes (e.g. someone clicked a radio button)
-		QObject::connect(g_dialog, &SegmenterDlg::stateChanged, []()
-		                 {
+		// Inside performActionA:
+        QObject::connect(g_dialog, &SegmenterDlg::stateChanged, [appInterface]()
+        {
             if (g_seedPicker && g_dialog) {
+                // Update mode
                 g_seedPicker->setPositiveMode(g_dialog->isAddingPositiveSeeds());
-            } });
+                
+                // Get parameters from UI (assuming you have a threshold slider, if not just use hardcoded for now)
+                double tau = g_dialog->getThreshold(); 
+                double radius = 0.1; // Or g_dialog->getSpatialWeight() if you repurposed it
+                
+                g_seedPicker->setAlgorithmParameters(radius, tau);
+                
+                // Only run if we actually have seeds!
+                g_seedPicker->runRegionGrowing(radius, tau);
+            } 
+        });
 
 		// --- SHOW UI ---
 		g_dialog->show();

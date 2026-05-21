@@ -1,49 +1,50 @@
-#ifndef SEED_PICKER_H
-#define SEED_PICKER_H
+#pragma once
 
-#include <ccMainAppInterface.h>
 #include <ccPickingListener.h>
+#include <ccMainAppInterface.h>
 #include <ccPointCloud.h>
 #include <vector>
 
 class SeedPicker : public ccPickingListener
 {
-  public:
-	// Constructor needs the app interface to access the picking Hub and Console
-	SeedPicker(ccMainAppInterface* app);
-	~SeedPicker() override;
+public:
+    SeedPicker(ccMainAppInterface* app);
+    virtual ~SeedPicker();
 
-	// to start and stop intercepting clicks
-	void startListening();
-	void stopListening();
+    void startListening();
+    void stopListening();
+    
+    // UI Trigger for the algorithm
+    void runRegionGrowing(double searchRadius, double tauThreshold);
 
-	// The core method overridden from ccPickingListener
-	void onItemPicked(const PickedItem& pi) override;
+    // Getters / Setters
+    void setPositiveMode(bool isPositive) { m_isPositive = isPositive; }
 
-	// Retrieve the seeds later
-	const std::vector<unsigned>& getPositiveSeeds() const
-	{
-		return m_positiveSeeds;
-	}
-	//positive/negative logic 
-	void setPositiveMode(bool isPositive)
-	{
-		m_isPositive = isPositive;
-	}
-	const std::vector<unsigned>& getNegativeSeeds() const //this fucntion does not alter the state of the class, 
-	{
-		return m_negativeSeeds;
-	}
+	void setAlgorithmParameters(double radius, double tau) {
+        m_searchRadius = radius;
+        m_tauThreshold = tau;
+    }
 
-  private:
-	ccMainAppInterface*   m_app;
-	std::vector<unsigned> m_positiveSeeds;
+protected:
+    // Only declared ONCE here
+    virtual void onItemPicked(const PickedItem& pi) override;
 
-	// Optional: Keep track of the specific cloud we are segmenting
-	ccPointCloud* m_targetCloud;
+private:
+    ccMainAppInterface* m_app;
+    ccPointCloud* m_targetCloud = nullptr;
+    ccPointCloud* m_previewCloud = nullptr;
 
-	bool                  m_isPositive = true;
-	std::vector<unsigned> m_negativeSeeds;
+    std::vector<unsigned int> m_positiveSeeds;
+    std::vector<unsigned int> m_negativeSeeds;
+    
+    // The compiler couldn't find this, so we ensure it is here in private:
+    std::vector<unsigned int> m_segmentedIndices; 
+
+	double m_searchRadius = 0.1;   // Default radius (adjust based on your sphere's scale)
+    double m_tauThreshold = 30.0;  // Default RGB distance (0-255 scale)
+
+    bool m_isPositive = true;
+
+    ccPointCloud* m_posMarkerCloud = nullptr;
+    ccPointCloud* m_negMarkerCloud = nullptr;
 };
-
-#endif // SEED_PICKER_H
