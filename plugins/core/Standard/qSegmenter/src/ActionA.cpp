@@ -1,106 +1,76 @@
-
 #include "ActionA.h"
-
 #include "SeedPicker.h"
 #include "SegmenterDlg.h"
 #include "ccMainAppInterface.h"
-#include "ccPointCloud.h" // Needed for Octree calculation
+#include "ccPointCloud.h"
 
 #include <QMainWindow>
 
 namespace Example
 {
-	// This is an example of an action's method called when the corresponding action
-	// is triggered (i.e. the corresponding icon or menu entry is clicked in CC's
-	// main interface). You can access most of CC's components (database,
-	// 3D views, console, etc.) via the 'appInterface' variable.
+    static SeedPicker*  g_seedPicker = nullptr;
+    static SegmenterDlg* g_dialog    = nullptr;
 
-	// We keep a static pointer for now just so it persists in the background.
-	// (Later, this should be a member variable of your qSegmenter class or UI dialog).
-	static SeedPicker* g_seedPicker = nullptr;
-	static SegmenterDlg* g_dialog     = nullptr;
+    void performActionA(ccMainAppInterface* appInterface)
+    {
+        if (appInterface == nullptr) return;
 
-	void performActionA(ccMainAppInterface* appInterface)
-	{
-		if (appInterface == nullptr)
-			return;
+        const ccHObject::Container& selected = appInterface->getSelectedEntities();
+        for (ccHObject* obj : selected)
+        {
+            if (obj->isA(CC_TYPES::POINT_CLOUD))
+            {
+                ccPointCloud* cloud = static_cast<ccPointCloud*>(obj);
+                if (!cloud->getOctree()) cloud->computeOctree();
+                break;
+            }
+        }
 
-		// --- SILENT OCTREE CALCULATION ---
-		// Let's grab the currently selected point cloud and build the octree
-		// before the Picking Hub has a chance to complain.
-		const ccHObject::Container& selected = appInterface->getSelectedEntities();
-		for (ccHObject* obj : selected)
-		{
-			if (obj->isA(CC_TYPES::POINT_CLOUD))
-			{
-				ccPointCloud* cloud = static_cast<ccPointCloud*>(obj);
-				if (!cloud->getOctree())
-				{
-					appInterface->dispToConsole("[Segmenter] Computing Octree for faster picking...", ccMainAppInterface::STD_CONSOLE_MESSAGE);
-					// This computes the octree. We pass the main window to show a progress bar if it takes a while!
-					//cloud->computeOctree(appInterface->getMainWindow());
-					cloud->computeOctree();
-				}
-				break; // Just grab the first point cloud we find
-			}
-		}
+        if (g_dialog == nullptr)
+        {
+            g_dialog     = new SegmenterDlg(appInterface->getMainWindow());
+            g_seedPicker = new SeedPicker(appInterface, g_dialog);
 
-		// --- INIT UI ---
-		if (g_dialog == nullptr)
-		{
-			// Pass the main window as the parent so the dialog floats correctly over CloudCompare
-			g_dialog = new SegmenterDlg(appInterface->getMainWindow());
+            g_dialog->setAttribute(Qt::WA_DeleteOnClose);
+            g_dialog->setStatusMessage("Click a point to start segmentation");
+            g_seedPicker->startListening();
 
-			// destroy the dialog object when the window is closed
-			g_dialog->setAttribute(Qt::WA_DeleteOnClose);
-
-			// Listen for when the dialog is destroyed to clean up our pointers and stop picking
-			QObject::connect(g_dialog, &QObject::destroyed, [appInterface]()
-			                 {
-                g_dialog = nullptr; // Reset the pointer
-                
+            // All connections are set up once here, avoiding duplicate signals
+            // on repeated menu invocations while the dialog is already open.
+            QObject::connect(g_dialog, &QObject::destroyed, [appInterface]() {
+                g_dialog = nullptr;
                 if (g_seedPicker) {
                     g_seedPicker->stopListening();
                     delete g_seedPicker;
                     g_seedPicker = nullptr;
                 }
-                appInterface->dispToConsole("[Segmenter] Dialog closed. Picking stopped.", ccMainAppInterface::STD_CONSOLE_MESSAGE); });
-		}
+            });
 
-		// 2. Initialize the Seed Picker if it doesn't exist
-		if (g_seedPicker == nullptr)
-		{
-			g_seedPicker = new SeedPicker(appInterface);
-			g_seedPicker->startListening();
-		}
+            QObject::connect(g_dialog, &SegmenterDlg::stateChanged, []() {
+                if (g_seedPicker && g_dialog)
+                    g_seedPicker->setPositiveMode(g_dialog->isAddingPositiveSeeds());
+            });
+            QObject::connect(g_dialog, &SegmenterDlg::applyRequested, []() {
+                if (g_seedPicker) g_seedPicker->runRegionGrowing();
+            });
+            QObject::connect(g_dialog, &SegmenterDlg::clearRequested, []() {
+                if (g_seedPicker) g_seedPicker->clearAll();
+            });
+            QObject::connect(g_dialog, &SegmenterDlg::undoRequested, []() {
+                if (g_seedPicker) g_seedPicker->undo();
+            });
+            QObject::connect(g_dialog, &SegmenterDlg::redoRequested, []() {
+                if (g_seedPicker) g_seedPicker->redo();
+            });
+            QObject::connect(g_dialog, &SegmenterDlg::exportRequested, []() {
+                if (g_seedPicker) g_seedPicker->exportSegmentation();
+            });
+        }
 
-		// --- WIRE UI TO PICKER ---
-		// Ensure picker starts with the correct mode based on the UI's default
-		g_seedPicker->setPositiveMode(g_dialog->isAddingPositiveSeeds());
+        g_seedPicker->setPositiveMode(g_dialog->isAddingPositiveSeeds());
 
-		// Inside performActionA:
-        QObject::connect(g_dialog, &SegmenterDlg::stateChanged, [appInterface]()
-        {
-            if (g_seedPicker && g_dialog) {
-                // Update mode
-                g_seedPicker->setPositiveMode(g_dialog->isAddingPositiveSeeds());
-                
-                // Get parameters from UI (assuming you have a threshold slider, if not just use hardcoded for now)
-                double tau = g_dialog->getThreshold(); 
-                double radius = 0.1; // Or g_dialog->getSpatialWeight() if you repurposed it
-                
-                g_seedPicker->setAlgorithmParameters(radius, tau);
-                
-                // Only run if we actually have seeds!
-                g_seedPicker->runRegionGrowing(radius, tau);
-            } 
-        });
-
-		// --- SHOW UI ---
-		g_dialog->show();
-		g_dialog->raise();          // Bring window to the front
-		g_dialog->activateWindow(); // Give it focus
-
-		appInterface->dispToConsole("[Segmenter] UI Opened and Picking Started!", ccMainAppInterface::STD_CONSOLE_MESSAGE);
-	}
-} 
+        g_dialog->show();
+        g_dialog->raise();
+        g_dialog->activateWindow();
+    }
+}
